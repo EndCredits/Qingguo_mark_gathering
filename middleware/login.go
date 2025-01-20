@@ -206,8 +206,8 @@ func LoginByQrCode(client *http.Client, ctx *context.Context, uuid16 string) (*h
 		}
 
 		data := string(body)
-		log.Info("username: ", data)
-		log.Info("password: ", uuid16)
+		// log.Info("username: ", data)
+		// log.Info("password: ", uuid16)
 		if data != "" {
 			scanflag = false
 			username := data

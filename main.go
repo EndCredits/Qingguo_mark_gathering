@@ -108,7 +108,7 @@ func getMarkHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Error writing response: %v", err)
 	}
-	log.Infof("Successfully responsed: %v", written)
+	log.Infof("Successfully responsed: %v, size: %v", uuid16, written)
 }
 
 func main() {
