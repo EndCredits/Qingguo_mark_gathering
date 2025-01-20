@@ -29,9 +29,9 @@ func getMarkbyUUID(uuid16 string, ctx *context.Context) ([]byte, error) {
 
 	client := &http.Client{
 		Jar:     jar,
-		Timeout: 10 * time.Second,
+		Timeout: 120 * time.Second,
 		Transport: &http.Transport{
-			IdleConnTimeout: 60 * time.Second,
+			IdleConnTimeout: 120 * time.Second,
 		},
 	}
 
