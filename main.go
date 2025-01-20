@@ -3,15 +3,21 @@ package main
 import (
 	"compress/gzip"
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"os"
 	"qingguo/middleware"
 	"qingguo/utils"
 	"time"
 
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	directory = ""
 )
 
 func getMarkbyUUID(uuid16 string, ctx *context.Context) ([]byte, error) {
@@ -60,13 +66,23 @@ func getMarkbyUUID(uuid16 string, ctx *context.Context) ([]byte, error) {
 		log.Error("Failed to get mark page: ", err)
 	}
 
-	parsedJson, err := utils.ParsePage(markPage)
+	studentID, parsedJson, err := utils.ParsePage(markPage)
 	if err != nil {
 		log.Error("Failed to parse page: ", err)
 	}
 
 	markResp.Body.Close()
 	retClient.CloseIdleConnections()
+
+	fileHandler, err := os.Create(directory + "/" + studentID + ".json")
+	if err != nil {
+		log.Fatal("Unable to save student marks json")
+		panic(err)
+	}
+	defer fileHandler.Close()
+
+	fileHandler.Write(parsedJson)
+
 	return parsedJson, nil
 }
 
@@ -96,6 +112,20 @@ func getMarkHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.StringVar(&directory, "directory", "", "Define where your file saved")
+	flag.Parse()
+
+	if len(directory) == 0 {
+		log.Fatal("Please define where you want your files to go (by --directory)")
+		os.Exit(-1)
+	}
+
+	_, err := utils.HasWritePermission(directory)
+	if err != nil {
+		log.Fatal("No permission to write: ", err)
+		os.Exit(-2)
+	}
+
 	http.HandleFunc("/getmark", getMarkHandler)
 
 	log.Info("Server is listening on port 32958...")

@@ -15,7 +15,7 @@ func isCourses(text string) bool {
 	return courseRegex.MatchString(text)
 }
 
-func ParsePage(content string) ([]byte, error) {
+func ParsePage(content string) (string, []byte, error) {
 	// Parse HTML with goquery
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err != nil {
@@ -72,7 +72,7 @@ func ParsePage(content string) ([]byte, error) {
 	jsonData, err := json.MarshalIndent(newStudent, "", "	")
 	if err != nil {
 		log.Fatal("Unable to convert student data to json: ", err)
-		return nil, err
+		return "", nil, err
 	}
-	return jsonData, nil
+	return studentID, jsonData, nil
 }
